@@ -1,0 +1,66 @@
+---
+title: "bikeshare"
+output: html_document
+date: '2022-11-02'
+---
+```{r}
+library(tidyverse)
+library(here)
+library(janitor)
+library(lubridate)
+```
+
+```{r}
+thisfile=here("data_raw", "202209-capitalbikeshare-tripdata.csv")
+df = read_csv(thisfile) %>% clean_names()
+```
+
+```{r}
+dfa = df %>% mutate(duration = as.numeric((ended_at-started_at)/60),
+                    hour_of_day = hour(started_at),
+                    day_of_week = wday(started_at, label = T))
+```
+
+```{r}
+dfb = dfa %>% filter(duration > 0)
+```
+
+
+```{r}
+dfb %>%
+  filter(month(started_at)==9,month(ended_at)==9) %>%
+select(rideable_type,start=started_at,end=ended_at) %>%
+  pivot_longer(start:end, names_to="type",values_to="t") %>% arrange(t) %>%
+  mutate(increment=case_when(
+   type=="start"~1,
+   type=="end" ~ -1
+  )) %>%
+  group_by(rideable_type) %>%
+  mutate(riders=cumsum(increment)) %>% filter(mday(t)<=7) %>%
+    ggplot(aes(t,riders,color=rideable_type)) + geom_step() +
+  facet_wrap(~mday(t),scales = "free_x",ncol = 7)
+```
+
+```{r}
+dfb %>%
+  filter(month(started_at)==9,month(ended_at)==9) %>%
+select(member_casual,start=started_at,end=ended_at) %>%
+  pivot_longer(start:end, names_to="type",values_to="t") %>% arrange(t) %>%
+  mutate(increment=case_when(
+   type=="start"~1,
+   type=="end" ~ -1
+  )) %>%
+  group_by(member_casual) %>%
+  mutate(riders=cumsum(increment)) %>%
+    ggplot(aes(t,riders,color=member_casual)) + geom_step() +
+  facet_wrap(~mday(t),scales = "free_x",ncol = 7)
+```
+
+```{r}
+library(gbfs)
+```
+
+```{r}
+cabi_free = 
+```
+
