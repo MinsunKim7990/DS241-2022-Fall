@@ -1,5 +1,5 @@
 ---
-title: "Minsun Kim_MA132"
+title: "Predicting MA132"
 output: html_document
 date: "2022-10-09"
 ---
@@ -10,23 +10,20 @@ library(janitor)
 ```
 
 ```{r}
-#filter and make a dataframe which we want to analyze
-thisfile = here("raw_data","CU_ACAD_DEPT_WHEN_OFF_ENRL_22740.csv")
-df = read_csv(thisfile) %>% clean_names() %>% 
-  filter(Component == "LEC", Course_ID %in% c(8732, 8733), startsWith(Term, "Fall") | startsWith(Term, "Spring")) %>%
-  select(course_ID, Catalog, Term, Term, Title, Tot_Enrl, Section)
+thisfile = here("data_raw","CU_ACAD_DEPT_WHEN_OFF_ENRL_22740.csv")
+df = read_csv(thisfile) %>% clean_names()
+df <- df %>% filter(component == "LEC", course_id %in% c(8732, 8733), startsWith(term_8, "Fall") | startsWith(term_8, "Spring")) %>%
+  select(course_id, catalog, term_7, term_8, title, tot_enrl, section)
 ```
 
 ```{r}
-#get 'past' data which don't include spring 22
-df_ma132_s = df %>% filter(course_id == 8733, startsWith(term2, "Spring")) %>% 
-  group_by(term2) %>%
+df_ma132_s = df %>% filter(course_id == 8733, startsWith(term_8, "Spring")) %>% 
+  group_by(term_8) %>%
   summarise(ma132_s = sum(tot_enrl)) %>%
   filter(ma132_s > 0)
 ```
 
 ```{r}
-#get enrollment of ma131 in fall of all year 
 df_ma131_f = df %>% filter(course_id == 8732, startsWith(term2, "Fall")) %>%
   group_by(term2) %>%
   summarise(ma131_enrl_f = sum(tot_enrl)) %>%

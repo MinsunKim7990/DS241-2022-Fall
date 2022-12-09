@@ -1,0 +1,86 @@
+---
+title: "airline Analysis"
+author: "minsun Kim"
+date: '2022-09-26'
+output: html_document
+---
+
+I will load the airline data, especially recent data through 2017~2022, and looking for interesting thing which I want to anaylize. 
+
+```{r}
+library(nycflights13)
+library(tidyverse)
+library(here)
+library(janitor)
+```
+
+
+```{r}
+thisfile=here("data_raw","DL_SelectFields2022.zip")
+
+df2022=read_csv(thisfile) %>% clean_names() %>% mutate(year = 2022)
+```
+
+```{r}
+thisfile=here("data_raw","airline_data_2021.zip")
+
+df2021=read_csv(thisfile) %>% clean_names() %>% mutate(year=2021)
+```
+
+```{r}
+thisfile=here("data_raw","DL_SelectFields_2020.zip")
+
+df2020=read_csv(thisfile) %>% clean_names() %>% mutate(year=2020)
+```
+
+```{r}
+thisfile=here("data_raw","airline_data_2018.zip")
+
+df2018=read_csv(thisfile) %>% clean_names() %>% mutate(year=2018)
+```
+
+```{r}
+thisfile=here("data_raw","DL_SelectFields_2017.zip")
+
+df2017=read_csv(thisfile) %>% clean_names() %>% mutate(year=2017)
+```
+
+```{r}
+df = bind_rows(df2017,df2018,df2020,df2021,df2022)
+```
+
+```{r}
+df <- df %>%
+  filter(passengers>0, carrier_name == "Delta Air Lines Inc.")
+
+df %>% ggplot(aes(x=month, y=passengers)) +
+  geom_bar(stat="identity") + facet_wrap(~year) +
+  labs(title = "Passengers by month each year in Delta")
+```
+
+```{r}
+df %>% ggplot(aes(x=month)) +
+  geom_bar(aes(weight=departures_performed)) + facet_wrap(~year) +
+  labs(title = "number of flights by month each year in Delta")
+```
+
+```{r}
+df %>% 
+```
+
+
+```{r}
+
+linear_reg() %>%
+  set_engine("lm") %>%
+  fit()
+
+```
+
+```{r}
+df5 = df2017 %>%
+  filter(passengers>0, carrier_name=="Republic Airline")
+
+df5 %>% ggplot(aes(x=month, y=passengers)) + geom_bar(stat="identity")
+```
+
